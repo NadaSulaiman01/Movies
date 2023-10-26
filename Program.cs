@@ -1,13 +1,11 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Movies.DTOs.AuthDTOs;
-using Movies.Models;
 using Movies.Seeds;
 using Movies.Services.Auth_Service;
+using Movies.Services.Cloudinary_Service;
 using Movies.Validators.Auth_Validators;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -20,6 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 //Add validators
 builder.Services.AddTransient<IValidator<LoginRequestDTO>, LoginValidator>();
@@ -79,7 +78,11 @@ builder.Services.AddSwaggerGen(c => {
 
 
 
+
+
 var app = builder.Build();
+
+CloudinarySettings.Initialize(builder.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -102,6 +105,9 @@ var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityR
 
 /*add roles to the database if not created*/
 await DefaultRoles.SeedRolesAsync(roleManager);
+
+var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+await DefaultGenres.SeedGenresAsync(dbContext);
 
 app.MapControllers();
 
