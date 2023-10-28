@@ -10,7 +10,7 @@ namespace Movies.Validators.Auth_Validators
 
             RuleFor(u => u.Email)
                 .NotNull().WithMessage("Email is null")
-                .NotEmpty().WithMessage("Email is empty.")
+                .NotEmpty().WithMessage("Email is empty")
                 .Must(email => email != null && email.Contains("@") && email.Contains("."))
                 .WithMessage("Invalid email format. Email must contain '@' and '.'");
 

@@ -9,7 +9,11 @@ using Movies.Services.Cloudinary_Service;
 using Movies.Validators.Auth_Validators;
 using Swashbuckle.AspNetCore.Filters;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+
+
 
 // Add services to the container.
 
@@ -101,13 +105,30 @@ var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 
 using var scope = scopeFactory.CreateScope();
 
+
+
+
+
+var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+var cloudinaryService = scope.ServiceProvider.GetRequiredService<ICloudinaryService>();
 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
 /*add roles to the database if not created*/
 await DefaultRoles.SeedRolesAsync(roleManager);
 
-var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//add genres to database if not added
 await DefaultGenres.SeedGenresAsync(dbContext);
+
+//add movies to database if not added
+var defaultMovies = new DefaultMovies(cloudinaryService, dbContext);
+await defaultMovies.SeedMoviesAsync();
+
+//add movies to database if not added
+var defaultCast = new DefaultCast(dbContext, cloudinaryService);
+await defaultCast.SeedCastAsync();
+
+var defaultActorsMovies = new DefaultActorMovie(dbContext);
+await defaultActorsMovies.SeedActorMoviesAsync();
 
 app.MapControllers();
 

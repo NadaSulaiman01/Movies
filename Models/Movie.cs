@@ -6,7 +6,7 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime ReleaseDate { get; set;}
-        public int rating { get; set;}
+        public int Rating { get; set;}
         public string PhotoUrl { get; set; }
 
         //each movie has one genre
@@ -14,10 +14,11 @@
         public Genre Genre { get; set;}
 
         //each movie many reviews
-        public ICollection<Review> Reviews { get; set; }
+        public ICollection<Review>? Reviews { get; set; }
 
         //each movie has many actors
-        public ICollection<Actor> Actors { get; set; }
+        //public ICollection<Actor> Actors { get; set; }
+        public ICollection<ActorMovie>? ActorMovies { get; set; }
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Movies.Models;
 
@@ -11,9 +12,10 @@ using Movies.Models;
 namespace Movies.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231028195206_AddActorMovieClass")]
+    partial class AddActorMovieClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,7 +179,7 @@ namespace Movies.Migrations
 
                     b.HasKey("ActorId");
 
-                    b.ToTable("Actors", (string)null);
+                    b.ToTable("Actors");
                 });
 
             modelBuilder.Entity("Movies.Models.ActorMovie", b =>
@@ -192,7 +194,7 @@ namespace Movies.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("ActorMovie", (string)null);
+                    b.ToTable("ActorMovie");
                 });
 
             modelBuilder.Entity("Movies.Models.ApplicationUser", b =>
@@ -278,7 +280,7 @@ namespace Movies.Migrations
 
                     b.HasKey("GenreId");
 
-                    b.ToTable("Genres", (string)null);
+                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("Movies.Models.Movie", b =>
@@ -314,7 +316,7 @@ namespace Movies.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.ToTable("Movies", (string)null);
+                    b.ToTable("Movies");
                 });
 
             modelBuilder.Entity("Movies.Models.Review", b =>
@@ -345,7 +347,7 @@ namespace Movies.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -420,7 +422,7 @@ namespace Movies.Migrations
 
             modelBuilder.Entity("Movies.Models.ApplicationUser", b =>
                 {
-                    b.OwnsMany("Movies.Models.ApplicationUser.RefreshTokens#Movies.Models.RefreshToken", "RefreshTokens", b1 =>
+                    b.OwnsMany("Movies.Models.RefreshToken", "RefreshTokens", b1 =>
                         {
                             b1.Property<string>("ApplicationUserId")
                                 .HasColumnType("nvarchar(450)");
@@ -446,7 +448,7 @@ namespace Movies.Migrations
 
                             b1.HasKey("ApplicationUserId", "Id");
 
-                            b1.ToTable("RefreshToken", (string)null);
+                            b1.ToTable("RefreshToken");
 
                             b1.WithOwner()
                                 .HasForeignKey("ApplicationUserId");

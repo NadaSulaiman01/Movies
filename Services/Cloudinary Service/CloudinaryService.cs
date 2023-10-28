@@ -24,21 +24,32 @@ namespace Movies.Services.Cloudinary_Service
 
 
 
-        public async Task<ImageUploadResult> UploadMovieImageAsync(IFormFile imageFile, string MovieName, string MovieGenre)
+        public async Task<ImageUploadResult> UploadMovieImageAsync(IFormFile imageFile, string MovieName, int MovieGenreId)
         {
             var imageUploadResult = new ImageUploadResult();
             if (imageFile.Length > 0)
             {
+                string folderName;
                 using var imageStream = imageFile.OpenReadStream();
+                if (MovieGenreId < 100) {
+                    folderName = "Poster";
+                } else
+                {
+                    folderName = "Cast";
+                }
+
+                
                 var imageUploadParams = new ImageUploadParams
                 {
+                    
                     File = new FileDescription(MovieName, imageStream),
                     PublicId = GetImagePublicId() + "_" + MovieName.Replace(' ', '_'),
-                    Folder = GetFolderPathForMovies(MovieGenre),
-                    Transformation = new Transformation().Height(250).Width(250).Crop("scale"),
+                    Folder = GetFolderPathForMovies(MovieGenreId, folderName),
+                    Transformation = new Transformation()
 
                 };
                 imageUploadResult = await _cloudinarySerive.UploadAsync(imageUploadParams);
+               
 
             }
 
@@ -67,7 +78,7 @@ namespace Movies.Services.Cloudinary_Service
 
 
         }
-        private string GetFolderPathForMovies(string MovieGenre) => "Movies/Poster/" + MovieGenre;
+        private string GetFolderPathForMovies(int MovieGenreId, string folderName) => $"Movies/{folderName}/" + MovieGenreId;
 
 
 

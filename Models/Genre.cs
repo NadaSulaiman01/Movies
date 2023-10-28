@@ -6,6 +6,6 @@
         public string Name { get; set; }
 
         //each genre has many movies
-        public ICollection<Movie> Movie { get; set; }
+        public ICollection<Movie>? Movie { get; set; }
     }
 }

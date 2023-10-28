@@ -8,6 +8,7 @@
         public string PhotoUrl { get; set; }
 
         //each actor has many movies
-        public ICollection<Movie> Movies { get; set; }
+        //public ICollection<Movie> Movies { get; set; }
+        public ICollection<ActorMovie>? ActorMovies { get; set; }
     }
 }
