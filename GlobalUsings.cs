@@ -6,3 +6,8 @@ global using Movies.DTOs.MoviesDTOs;
 global using Movies.Models;
 global using Movies.Services;
 global using Movies.Helpers;
+global using Movies.Services.Movies_Service;
+global using Movies.Services.Reviews_Service;
+global using Movies.Validators.Auth_Validators;
+global using Movies.DTOs.ReviewsDTOs;
+global using Movies.Services.Cloudinary_Service;

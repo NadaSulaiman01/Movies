@@ -1,5 +1,4 @@
 ﻿using Movies.Models;
-using Movies.Services.Cloudinary_Service;
 
 namespace Movies.Seeds
 {

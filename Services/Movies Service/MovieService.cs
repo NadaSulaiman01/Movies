@@ -71,6 +71,7 @@ namespace Movies.Services.Movies_Service
                 .Where(m => m.MovieId == movieId)
                 .Include(m => m.Genre)
                 .Include(m => m.Reviews)
+                .ThenInclude(r => r.User)
                 .Include(m => m.ActorMovies)
                 .ThenInclude(a => a.Actor)
                 .FirstOrDefaultAsync();
@@ -102,6 +103,7 @@ namespace Movies.Services.Movies_Service
                                 Content = r.Content,
                                 TimeCreated = r.TimeCreated,
                                 UserId = r.UserId,
+                                UserName = r.User.UserName,
                                 MovieId = r.MovieId
                             }
                     )
