@@ -2,6 +2,7 @@
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Identity;
 global using Movies.DTOs;
+global using Movies.DTOs.MoviesDTOs;
 global using Movies.Models;
 global using Movies.Services;
 global using Movies.Helpers;

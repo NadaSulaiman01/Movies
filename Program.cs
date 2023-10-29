@@ -6,6 +6,7 @@ using Movies.DTOs.AuthDTOs;
 using Movies.Seeds;
 using Movies.Services.Auth_Service;
 using Movies.Services.Cloudinary_Service;
+using Movies.Services.Movies_Service;
 using Movies.Validators.Auth_Validators;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -23,6 +24,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
 
 //Add validators
 builder.Services.AddTransient<IValidator<LoginRequestDTO>, LoginValidator>();
