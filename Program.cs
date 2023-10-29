@@ -26,6 +26,7 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 //Add validators
 builder.Services.AddTransient<IValidator<LoginRequestDTO>, LoginValidator>();
+builder.Services.AddTransient<IValidator<SignUpRequestDTO>, SignUpValidator>();
 
 
 //Connect to database
