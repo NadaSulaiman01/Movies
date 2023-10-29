@@ -1,19 +1,8 @@
-using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Movies.DTOs.AuthDTOs;
-using Movies.Seeds;
-using Movies.Services.Auth_Service;
-using Movies.Services.Cloudinary_Service;
-using Movies.Validators.Review_Validators;
+using Movies.Custom_Middleware;
 using Swashbuckle.AspNetCore.Filters;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 
 // Add services to the container.
@@ -104,6 +93,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<CustomErrorResponseMiddleware>();
 
 app.UseAuthentication();
 
