@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Movies.DTOs.AuthDTOs;
 using Movies.Services.Auth_Service;
@@ -11,18 +12,22 @@ namespace Movies.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
+        private readonly IValidator<LoginRequestDTO> _loginValidator;
+        private readonly IValidator<SignUpRequestDTO> _signupValidator;
+
+        public AuthController(IAuthService authService, IValidator<LoginRequestDTO> loginValidator, IValidator<SignUpRequestDTO> signupValidator)
         {
             _authService = authService;
-
+            _loginValidator = loginValidator;
+            _signupValidator = signupValidator;
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<ServiceResponse<AuthResponseDTO>>> LoginUserAsync(LoginRequestDTO request)
         {
 
-            var validator = new LoginValidator();
-            var validationResult = validator.Validate(request);
+            //var validator = new LoginValidator();
+            var validationResult = _loginValidator.Validate(request);
 
             // Check if the validation failed
             if (!validationResult.IsValid)
@@ -49,8 +54,8 @@ namespace Movies.Controllers
         public async Task<ActionResult<ServiceResponse<AuthResponseDTO>>> RegisterUserAsync(SignUpRequestDTO request)
         {
 
-            var validator = new SignUpValidator();
-            var validationResult = validator.Validate(request);
+            //var validator = new SignUpValidator();
+            var validationResult = _signupValidator.Validate(request);
 
             // Check if the validation failed
             if (!validationResult.IsValid)
