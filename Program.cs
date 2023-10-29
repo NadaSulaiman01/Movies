@@ -1,13 +1,13 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Movies.DTOs.AuthDTOs;
 using Movies.Seeds;
 using Movies.Services.Auth_Service;
 using Movies.Services.Cloudinary_Service;
-using Movies.Services.Movies_Service;
-using Movies.Validators.Auth_Validators;
+using Movies.Validators.Review_Validators;
 using Swashbuckle.AspNetCore.Filters;
 
 
@@ -25,11 +25,16 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 //Add validators
+//Configure Authentication validators
 builder.Services.AddTransient<IValidator<LoginRequestDTO>, LoginValidator>();
 builder.Services.AddTransient<IValidator<SignUpRequestDTO>, SignUpValidator>();
 
+//Configure Review validators
+builder.Services.AddTransient<IValidator<AddReviewDTO>, AddReviewValidator>();
+builder.Services.AddTransient<IValidator<EditReviewDTO>, EditReviewValidator>();
 
 //Connect to database
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -115,6 +120,8 @@ using var scope = scopeFactory.CreateScope();
 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 var cloudinaryService = scope.ServiceProvider.GetRequiredService<ICloudinaryService>();
 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
 /*add roles to the database if not created*/
 await DefaultRoles.SeedRolesAsync(roleManager);
@@ -126,12 +133,17 @@ await DefaultGenres.SeedGenresAsync(dbContext);
 var defaultMovies = new DefaultMovies(cloudinaryService, dbContext);
 await defaultMovies.SeedMoviesAsync();
 
-//add movies to database if not added
+//add actor to database if not added
 var defaultCast = new DefaultCast(dbContext, cloudinaryService);
 await defaultCast.SeedCastAsync();
 
+//add ActorsMovies to database if not added
 var defaultActorsMovies = new DefaultActorMovie(dbContext);
 await defaultActorsMovies.SeedActorMoviesAsync();
+
+//add a user and an admin to database if not added
+var defaultAppUsers = new DefaultAppUsers(configuration,userManager);
+await defaultAppUsers.SeedAdminUserAsync();
 
 app.MapControllers();
 
