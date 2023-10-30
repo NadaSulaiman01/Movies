@@ -8,6 +8,8 @@
         Task<ServiceResponse<MoviesListDTO>> GetAllMovies(int page, int pageSize);
         Task<ServiceResponse<MoviesListDTO>> GetMoviesBySearchName(string searchInput, int page, int pageSize);
         Task<ServiceResponse<List<MovieNameDTO>>> GetMoviesSuggestions(string searchInput);
-        
+        Task<ServiceResponse<List<GenreNameDTO>>> GetGenreNames();
+
+
     }
 }

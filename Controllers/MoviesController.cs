@@ -101,6 +101,15 @@ namespace Movies.Controllers
             return Ok(response);
         }
 
+        [HttpGet("GetAllGenres")]
+        public async Task<ActionResult<ServiceResponse<List<GenreNameDTO>>>> GetGenreNames()
+        {
+            var response = new ServiceResponse<List<GenreNameDTO>> ();
+            response = await _movieService.GetGenreNames();
+            return Ok(response);
+
+        }
+
         private ServiceResponseWithoutData checkPagination(int page, int pageSize)
         {
             var result = new ServiceResponseWithoutData();
@@ -116,5 +125,7 @@ namespace Movies.Controllers
             }
             return result;
         }
+
+
     }
 }

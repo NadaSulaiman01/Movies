@@ -285,5 +285,27 @@ namespace Movies.Services.Movies_Service
 
             return response;
         }
+
+        public async Task<ServiceResponse<List<GenreNameDTO>>> GetGenreNames()
+        {
+            var response = new ServiceResponse<List<GenreNameDTO>>();
+            var genre = await _context.Genres.Select(g => new GenreNameDTO
+            {
+                GenreId = g.GenreId,
+                GenreName = g.Name
+            }).ToListAsync();
+
+            if (genre is null)
+            {
+                response.Success= false;
+                response.Message = "There are no genres to fetch";
+                return response;
+            }
+            
+            response.Data = genre;
+            response.Success = true;
+            response.Message = "Genres are fetched successfully";
+            return response;
+        }
     }
 }

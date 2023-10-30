@@ -83,3 +83,8 @@ C:\Users\nsulaiman\source\repos\Movies\bin\Debug\net6.0\CloudinaryDotNet.dll
 C:\Users\nsulaiman\source\repos\Movies\bin\Debug\net6.0\Newtonsoft.Json.dll
 C:\Users\nsulaiman\source\repos\Movies\bin\Debug\net6.0\package-lock.json
 C:\Users\nsulaiman\source\repos\Movies\bin\Debug\net6.0\package.json
+C:\Users\nsulaiman\source\repos\Movies\bin\Debug\net6.0\System.Web.Cors.dll
+C:\Users\nsulaiman\source\repos\Movies\bin\Debug\net6.0\System.Net.Http.Formatting.dll
+C:\Users\nsulaiman\source\repos\Movies\bin\Debug\net6.0\System.Web.Http.dll
+C:\Users\nsulaiman\source\repos\Movies\bin\Debug\net6.0\System.Web.Http.Cors.dll
+C:\Users\nsulaiman\source\repos\Movies\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
