@@ -6,7 +6,7 @@
         public int GenreId { get; set; }
         public string GenreName { get; set; }
         public string Title { get; set; }
-        public DateTime ReleaseDate { get; set; }
+        public int ReleaseDate { get; set; }
         public int Rating { get; set; }
         public string PhotoUrl { get; set; }
     }

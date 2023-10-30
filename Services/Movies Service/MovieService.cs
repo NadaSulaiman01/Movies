@@ -44,7 +44,7 @@ namespace Movies.Services.Movies_Service
                                 GenreName = genre.GenreName,
                                 Title = m.Title,
                                 Rating = m.Rating,
-                                ReleaseDate = m.ReleaseDate,
+                                ReleaseDate = DateExtractor.ExtractYear(m.ReleaseDate), 
                                 PhotoUrl = m.PhotoUrl
                             }
                     )
@@ -88,7 +88,7 @@ namespace Movies.Services.Movies_Service
             dto.Title = movie.Title;
             dto.Description = movie.Description;
             dto.Rating = movie.Rating;
-            dto.ReleaseDate = movie.ReleaseDate;
+            dto.ReleaseDate = DateExtractor.ExtractYear(movie.ReleaseDate);
             dto.PhotoUrl = movie.PhotoUrl;
             dto.GenreId = movie.GenreId;
             dto.GenreName = movie.Genre.Name;
@@ -154,7 +154,7 @@ namespace Movies.Services.Movies_Service
                     GenreName = genre.Name,
                     Title = m.Title,
                     Rating = m.Rating,
-                    ReleaseDate = m.ReleaseDate,
+                    ReleaseDate = DateExtractor.ExtractYear(m.ReleaseDate),
                     PhotoUrl = m.PhotoUrl
                 })
                 .Skip(skipAmount)
@@ -195,7 +195,7 @@ namespace Movies.Services.Movies_Service
                     GenreName = m.Genre.Name,
                     Title = m.Title,
                     Rating = m.Rating,
-                    ReleaseDate = m.ReleaseDate,
+                    ReleaseDate = DateExtractor.ExtractYear(m.ReleaseDate),
                     PhotoUrl = m.PhotoUrl
                 })
                 .Skip(skipAmount)
@@ -234,7 +234,7 @@ namespace Movies.Services.Movies_Service
                     GenreName = m.Genre.Name,
                     Title = m.Title,
                     Rating = m.Rating,
-                    ReleaseDate = m.ReleaseDate,
+                    ReleaseDate = DateExtractor.ExtractYear(m.ReleaseDate),
                     PhotoUrl = m.PhotoUrl
                 })
                 .Where(m => m.Title.Contains(searchInput))

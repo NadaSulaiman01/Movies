@@ -8,7 +8,7 @@ namespace Movies.DTOs.MoviesDTOs
         public int MovieId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public DateTime ReleaseDate { get; set; }
+        public int ReleaseDate { get; set; }
         public int Rating { get; set; }
         public string PhotoUrl { get; set; }
         public int GenreId { get; set; }
