@@ -45,7 +45,7 @@ namespace Movies.Services.Cloudinary_Service
                     File = new FileDescription(MovieName, imageStream),
                     PublicId = GetImagePublicId() + "_" + MovieName.Replace(' ', '_'),
                     Folder = GetFolderPathForMovies(MovieGenreId, folderName),
-                    Transformation = new Transformation()
+                    Transformation = new Transformation().Height(155).Width(235).Crop("scale"),
 
                 };
                 imageUploadResult = await _cloudinarySerive.UploadAsync(imageUploadParams);
