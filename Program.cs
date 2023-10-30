@@ -25,6 +25,18 @@ builder.Services.AddTransient<IValidator<SignUpRequestDTO>, SignUpValidator>();
 builder.Services.AddTransient<IValidator<AddReviewDTO>, AddReviewValidator>();
 builder.Services.AddTransient<IValidator<EditReviewDTO>, EditReviewValidator>();
 
+// Add CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", builder =>
+    {
+        builder.WithOrigins("http://localhost:4200") // Update this with your actual frontend URL
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
+    });
+});
+
 //Connect to database
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
@@ -93,6 +105,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontend"); // Enable CORS before other middleware
 
 app.UseMiddleware<CustomErrorResponseMiddleware>();
 
