@@ -102,7 +102,7 @@ namespace Movies.Services.Movies_Service
                             {
                                 ReviewId = r.ReviewId,
                                 Content = r.Content,
-                                TimeCreated = r.TimeCreated,
+                                TimeCreated = DateExtractor.FormatConverter(r.TimeCreated),
                                 UserId = r.UserId,
                                 UserName = r.User.UserName,
                                 MovieId = r.MovieId
@@ -336,6 +336,108 @@ namespace Movies.Services.Movies_Service
 
             return response;
 
+        }
+
+        public async Task<ServiceResponse<ShortMovieDTO>> GetShortMovieById(int movieId)
+        {
+            var response = new ServiceResponse<ShortMovieDTO>();
+
+
+            var movie = await _context.Movies
+              .Include(m => m.Genre)
+              .Where(m => m.MovieId == movieId)
+              .Select(m => new ShortMovieDTO
+              {
+                  MovieId = m.MovieId,
+                  Title = m.Title,
+                  Description = m.Description,
+                  Rating = m.Rating,
+                  ReleaseDate = DateExtractor.ExtractYear(m.ReleaseDate),
+                  GenreId = m.GenreId,
+                  GenreName = m.Genre.Name,
+                  PhotoUrl = m.PhotoUrl
+              })
+              .FirstOrDefaultAsync();
+
+
+            if(movie == null)
+            {
+                response.Success = false;
+                response.Message = "No movie with this id exits";
+                return response;
+            }
+
+            response.Data = movie;
+            response.Success = true;
+            response.Message = "Movie is fetched successfully";
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<ShortActorDTO>>> GetActorsByMovieId(int movieId)
+        {
+            // throw new NotImplementedException();
+            var response = new ServiceResponse<List<ShortActorDTO>> ();
+
+            bool movieExists = await _context.Movies.AnyAsync(m => m.MovieId == movieId);
+
+            if (!movieExists)
+            {
+                response.Success = false;
+                response.Message = "No movie with this ID exists in the database";
+                return response;
+            }
+
+            var actors = await _context.ActorMovie.Where(a => a.MovieId == movieId).Include(a => a.Actor)
+                .Select(a => new ShortActorDTO
+                {
+                    ActorId = a.ActorId,
+                    ActorName = a.Actor.ActorName,
+                    PhotoUrl = a.Actor.PhotoUrl
+                })
+                .ToListAsync();
+
+
+            response.Data = actors;
+            response.Success = true;
+            response.Message = "Actors are fetched successfully";
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<ReviewDTO>>> GetReviewsByMovieId(int movieId)
+        {
+            //throw new NotImplementedException();
+            var response = new ServiceResponse<List<ReviewDTO>>();
+
+            bool movieExists = await _context.Movies.AnyAsync(m => m.MovieId == movieId);
+
+            if (!movieExists)
+            {
+                response.Success = false;
+                response.Message = "No movie with this ID exists in the database";
+                return response;
+            }
+
+            var reviews = await _context.Reviews.Where(a => a.MovieId == movieId).Include(r => r.User)
+                .Select(r => new ReviewDTO
+                {
+                    ReviewId = r.ReviewId,
+                    Content = r.Content,
+                    TimeCreated = DateExtractor.FormatConverter(r.TimeCreated),
+                    UserId = r.UserId,
+                    UserName = r.User.UserName,
+                    MovieId = r.MovieId
+
+                })
+                .ToListAsync();
+
+
+            response.Data = reviews;
+            response.Success = true;
+            response.Message = "Reviews are fetched successfully";
+
+            return response;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Movies.DTOs.ActorsDTOs;
 using Movies.DTOs.AuthDTOs;
 using Movies.Services.Movies_Service;
 
@@ -118,6 +119,34 @@ namespace Movies.Controllers
             response = await _movieService.GetAllMoviesWithoutPagination();
             return Ok(response);
         }
+
+        //GetShortMovieById
+        [HttpGet("GetShortMovieById")]
+        public async Task<ActionResult<ServiceResponse<ShortMovieDTO>>> GetShortMovieById(int movieId)
+        {
+            var response = new ServiceResponse<ShortMovieDTO>();
+            response = await _movieService.GetShortMovieById(movieId);
+            return Ok(response);
+        }
+
+        //GetActorsByMovieId
+        [HttpGet("GetActorsByMovieId")]
+        public async Task<ActionResult<ServiceResponse<List<ShortActorDTO>>>> GetActorsByMovieId(int movieId)
+        {
+            var response = new ServiceResponse<List<ShortActorDTO>>();
+            response = await _movieService.GetActorsByMovieId(movieId);
+            return Ok(response);
+        }
+
+        //GetReviewsByMovieId
+        [HttpGet("GetReviewsByMovieId")]
+        public async Task<ActionResult<ServiceResponse<List<ReviewDTO>>>> GetReviewsByMovieId(int movieId)
+        {
+            var response = new ServiceResponse<List<ReviewDTO>>();
+            response = await _movieService.GetReviewsByMovieId(movieId);
+            return Ok(response);
+        }
+
 
         private ServiceResponseWithoutData checkPagination(int page, int pageSize)
         {

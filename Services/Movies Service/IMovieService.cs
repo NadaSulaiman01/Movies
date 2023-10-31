@@ -1,4 +1,6 @@
-﻿namespace Movies.Services.Movies_Service
+﻿using Movies.DTOs.ActorsDTOs;
+
+namespace Movies.Services.Movies_Service
 {
     public interface IMovieService
     {
@@ -10,6 +12,9 @@
         Task<ServiceResponse<List<MovieNameDTO>>> GetMoviesSuggestions(string searchInput);
         Task<ServiceResponse<List<GenreNameDTO>>> GetGenreNames();
         Task<ServiceResponse<List<MovieNameDTO>>> GetAllMoviesWithoutPagination();
+        Task<ServiceResponse<ShortMovieDTO>> GetShortMovieById(int movieId);
+        Task<ServiceResponse<List<ShortActorDTO>>> GetActorsByMovieId(int movieId);
+        Task<ServiceResponse<List<ReviewDTO>>> GetReviewsByMovieId(int movieId);
 
 
     }

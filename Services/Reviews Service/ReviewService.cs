@@ -62,7 +62,7 @@ namespace Movies.Services.Reviews_Service
             {
                 ReviewId = review.ReviewId,
                 Content = review.Content,
-                TimeCreated = review.TimeCreated,
+                TimeCreated = DateExtractor.FormatConverter(review.TimeCreated),
                 UserId = review.UserId,
                 MovieId = review.MovieId,
                 UserName = user.UserName
@@ -113,7 +113,7 @@ namespace Movies.Services.Reviews_Service
             {
                 ReviewId = review.ReviewId,
                 Content = review.Content,
-                TimeCreated = review.TimeCreated,
+                TimeCreated = DateExtractor.FormatConverter(review.TimeCreated),
                 UserId = review.UserId,
                 MovieId = review.MovieId,
                 UserName = user.UserName
