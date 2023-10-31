@@ -265,7 +265,6 @@ namespace Movies.Services.Movies_Service
           
 
             var movies = await _context.Movies
-                .Include(m => m.Genre)
                 .Select(m => new MovieNameDTO
                 {
                     MovieId = m.MovieId,
@@ -306,6 +305,33 @@ namespace Movies.Services.Movies_Service
             response.Success = true;
             response.Message = "Genres are fetched successfully";
             return response;
+        }
+
+        public async Task<ServiceResponse<List<MovieNameDTO>>> GetAllMoviesWithoutPagination()
+        {
+            //throw new NotImplementedException();
+            var response = new ServiceResponse<List<MovieNameDTO>>();
+
+
+            var movies = await _context.Movies
+                .Select(m => new MovieNameDTO
+                {
+                    MovieId = m.MovieId,
+                    MovieTitle = m.Title,
+                })
+                .OrderBy(m => m.MovieTitle)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var moviesNamesList = new List<MovieNameDTO>();
+            moviesNamesList = movies;
+
+            response.Data = moviesNamesList;
+            response.Success = true;
+            response.Message = "Movies are fetched successfully";
+
+            return response;
+
         }
     }
 }

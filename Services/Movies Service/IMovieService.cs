@@ -9,6 +9,7 @@
         Task<ServiceResponse<MoviesListDTO>> GetMoviesBySearchName(string searchInput, int page, int pageSize);
         Task<ServiceResponse<List<MovieNameDTO>>> GetMoviesSuggestions(string searchInput);
         Task<ServiceResponse<List<GenreNameDTO>>> GetGenreNames();
+        Task<ServiceResponse<List<MovieNameDTO>>> GetAllMoviesWithoutPagination();
 
 
     }

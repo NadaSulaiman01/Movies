@@ -110,6 +110,15 @@ namespace Movies.Controllers
 
         }
 
+        //GetAllMoviesWithoutPagination
+        [HttpGet("GetAllMoviesWithoutPagination")]
+        public async Task<ActionResult<ServiceResponse<List<MovieNameDTO>>>> GetAllMoviesWithoutPagination()
+        {
+            var response = new ServiceResponse<List<MovieNameDTO>>();
+            response = await _movieService.GetAllMoviesWithoutPagination();
+            return Ok(response);
+        }
+
         private ServiceResponseWithoutData checkPagination(int page, int pageSize)
         {
             var result = new ServiceResponseWithoutData();
