@@ -248,7 +248,7 @@ namespace Movies.Services.Movies_Service
                 .AsNoTracking()
                 .ToListAsync();
 
-            var totalMovies = await _context.Movies.CountAsync();
+            var totalMovies = await _context.Movies.Where(m => m.Title.Contains(searchInput)).CountAsync();
 
             var moviesListDTO = new MoviesListDTO();
             moviesListDTO.Movies = movies;
