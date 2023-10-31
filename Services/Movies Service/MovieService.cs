@@ -45,6 +45,7 @@ namespace Movies.Services.Movies_Service
                                 Title = m.Title,
                                 Rating = m.Rating,
                                 ReleaseDate = DateExtractor.ExtractYear(m.ReleaseDate), 
+                                Description = m.Description,
                                 PhotoUrl = m.PhotoUrl
                             }
                     )
@@ -155,6 +156,7 @@ namespace Movies.Services.Movies_Service
                     Title = m.Title,
                     Rating = m.Rating,
                     ReleaseDate = DateExtractor.ExtractYear(m.ReleaseDate),
+                    Description = m.Description,
                     PhotoUrl = m.PhotoUrl
                 })
                 .Skip(skipAmount)
@@ -196,6 +198,7 @@ namespace Movies.Services.Movies_Service
                     Title = m.Title,
                     Rating = m.Rating,
                     ReleaseDate = DateExtractor.ExtractYear(m.ReleaseDate),
+                    Description = m.Description,
                     PhotoUrl = m.PhotoUrl
                 })
                 .Skip(skipAmount)
@@ -234,6 +237,7 @@ namespace Movies.Services.Movies_Service
                     GenreName = m.Genre.Name,
                     Title = m.Title,
                     Rating = m.Rating,
+                    Description = m.Description,
                     ReleaseDate = DateExtractor.ExtractYear(m.ReleaseDate),
                     PhotoUrl = m.PhotoUrl
                 })
