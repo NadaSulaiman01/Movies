@@ -429,7 +429,7 @@ namespace Movies.Services.Movies_Service
                     UserName = r.User.UserName,
                     MovieId = r.MovieId
 
-                })
+                }).OrderByDescending(r => r.TimeCreated)
                 .ToListAsync();
 
 
