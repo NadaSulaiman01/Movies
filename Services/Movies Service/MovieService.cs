@@ -405,10 +405,10 @@ namespace Movies.Services.Movies_Service
             return response;
         }
 
-        public async Task<ServiceResponse<List<ReviewDTO>>> GetReviewsByMovieId(int movieId)
+        public async Task<ServiceResponse<MovieReviewsDTO>> GetReviewsByMovieId(int movieId, int page, int pageSize, int skipNumber)
         {
             //throw new NotImplementedException();
-            var response = new ServiceResponse<List<ReviewDTO>>();
+            var response = new ServiceResponse<MovieReviewsDTO>();
 
             bool movieExists = await _context.Movies.AnyAsync(m => m.MovieId == movieId);
 
@@ -419,7 +419,9 @@ namespace Movies.Services.Movies_Service
                 return response;
             }
 
-            var reviews = await _context.Reviews.Where(a => a.MovieId == movieId).Include(r => r.User)
+            var skipAmount = (page - 1) * pageSize;
+
+            var reviews = await _context.Reviews.Where(a => a.MovieId == movieId).Include(r => r.User).OrderByDescending(r => r.TimeCreated)
                 .Select(r => new ReviewDTO
                 {
                     ReviewId = r.ReviewId,
@@ -429,11 +431,16 @@ namespace Movies.Services.Movies_Service
                     UserName = r.User.UserName,
                     MovieId = r.MovieId
 
-                }).OrderByDescending(r => r.TimeCreated)
+                }).Skip(skipAmount+skipNumber)
+                .Take(pageSize)
                 .ToListAsync();
 
+            int reviewsCount = await _context.Reviews.Where(a => a.MovieId == movieId).CountAsync();
 
-            response.Data = reviews;
+            response.Data = new MovieReviewsDTO();
+
+            response.Data.Reviews = reviews;
+            response.Data.reviewsCount = reviewsCount;
             response.Success = true;
             response.Message = "Reviews are fetched successfully";
 

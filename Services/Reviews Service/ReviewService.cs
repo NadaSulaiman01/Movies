@@ -27,6 +27,7 @@ namespace Movies.Services.Reviews_Service
             var response = new ServiceResponse<ReviewDTO>();
 
             //check if the current user is registered in the database
+            //Console.WriteLine(GetUserId());
             var user = await _usermanager.FindByIdAsync(GetUserId());
 
             if (user is null)

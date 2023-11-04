@@ -140,10 +140,10 @@ namespace Movies.Controllers
 
         //GetReviewsByMovieId
         [HttpGet("GetReviewsByMovieId")]
-        public async Task<ActionResult<ServiceResponse<List<ReviewDTO>>>> GetReviewsByMovieId(int movieId)
+        public async Task<ActionResult<ServiceResponse<List<ReviewDTO>>>> GetReviewsByMovieId(int movieId, int page, int pageSize, int skipNumber)
         {
-            var response = new ServiceResponse<List<ReviewDTO>>();
-            response = await _movieService.GetReviewsByMovieId(movieId);
+            var response = new ServiceResponse<MovieReviewsDTO>();
+            response = await _movieService.GetReviewsByMovieId(movieId, page,pageSize, skipNumber);
             return Ok(response);
         }
 

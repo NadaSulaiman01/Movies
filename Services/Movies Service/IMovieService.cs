@@ -14,7 +14,7 @@ namespace Movies.Services.Movies_Service
         Task<ServiceResponse<List<MovieNameDTO>>> GetAllMoviesWithoutPagination();
         Task<ServiceResponse<ShortMovieDTO>> GetShortMovieById(int movieId);
         Task<ServiceResponse<List<ShortActorDTO>>> GetActorsByMovieId(int movieId);
-        Task<ServiceResponse<List<ReviewDTO>>> GetReviewsByMovieId(int movieId);
+        Task<ServiceResponse<MovieReviewsDTO>> GetReviewsByMovieId(int movieId, int pageNumber ,int pageSize, int skipNumber);
 
 
     }
