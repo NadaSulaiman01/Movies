@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Movies.DTOs.ActorsDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Movies.DTOs.AuthDTOs;
 using Movies.Services.Movies_Service;
+using Movies.Validators.Review_Validators;
 
 namespace Movies.Controllers
 {
@@ -11,10 +13,12 @@ namespace Movies.Controllers
     public class MoviesController : ControllerBase
     {
         private readonly IMovieService _movieService;
+        private readonly IValidator<AddMovieDTO> _addMovieValidator;
 
-        public MoviesController(IMovieService movieService)
+        public MoviesController(IMovieService movieService, IValidator<AddMovieDTO> addMovieValidator)
         {
             _movieService = movieService;
+            _addMovieValidator = addMovieValidator;
         }
 
         [HttpGet]
@@ -142,9 +146,48 @@ namespace Movies.Controllers
         [HttpGet("GetReviewsByMovieId")]
         public async Task<ActionResult<ServiceResponse<List<ReviewDTO>>>> GetReviewsByMovieId(int movieId, int page, int pageSize, int skipNumber)
         {
+            var paginationCheck = checkPagination(page, pageSize);
+            if (!paginationCheck.Success)
+            {
+                return Ok(paginationCheck);
+            }
             var response = new ServiceResponse<MovieReviewsDTO>();
             response = await _movieService.GetReviewsByMovieId(movieId, page,pageSize, skipNumber);
             return Ok(response);
+        }
+
+        [Authorize(Roles = AppRolesConstants.Admin)]
+        [HttpPost("AddMovie")]
+        public async Task<ActionResult<ServiceResponse<int>>> AddMovieByAdmin(AddMovieDTO dto)
+        {
+            var validationResult = _addMovieValidator.Validate(dto);
+
+            // Check if the validation failed
+            if (!validationResult.IsValid)
+            {
+                string errorMessage = string.Join(", ", validationResult.Errors);
+
+
+                var validationResponse = new ServiceResponseWithoutData
+                {
+                    Success = false,
+                    Message = errorMessage
+                };
+
+                return Ok(validationResponse);
+            }
+
+            var response = await _movieService.AddMovieByAdmin(dto);
+            return Ok(response);
+        }
+
+        [HttpGet("GetAllActors")]
+        public async Task<ActionResult<ServiceResponse<List<ActorNamesDTO>>>> GetActorNames()
+        {
+            var response = new ServiceResponse<List<ActorNamesDTO>>();
+            response = await _movieService.GetActorNames();
+            return Ok(response);
+
         }
 
 

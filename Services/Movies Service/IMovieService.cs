@@ -15,6 +15,10 @@ namespace Movies.Services.Movies_Service
         Task<ServiceResponse<ShortMovieDTO>> GetShortMovieById(int movieId);
         Task<ServiceResponse<List<ShortActorDTO>>> GetActorsByMovieId(int movieId);
         Task<ServiceResponse<MovieReviewsDTO>> GetReviewsByMovieId(int movieId, int pageNumber ,int pageSize, int skipNumber);
+        Task<ServiceResponse<int>> AddMovieByAdmin(AddMovieDTO dto);
+        Task<ServiceResponseWithoutData> DeleteMovieByAdmin(int movieId);
+        Task<ServiceResponse<List<ActorNamesDTO>>> GetActorNames();
+
 
 
     }

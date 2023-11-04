@@ -1,16 +1,25 @@
-﻿using Movies.DTOs.ActorsDTOs;
+﻿using Microsoft.AspNetCore.Identity;
+using Movies.DTOs.ActorsDTOs;
 using Movies.Models;
 using System.Collections.Generic;
+using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Movies.Services.Movies_Service
 {
     public class MovieService : IMovieService
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _usermanager;
+        private readonly ICloudinaryService _cloudinaryService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MovieService(ApplicationDbContext context)
+        public MovieService(ApplicationDbContext context, UserManager<ApplicationUser> usermanager, ICloudinaryService cloudinaryService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _usermanager = usermanager;
+            _cloudinaryService = cloudinaryService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ServiceResponse<GetHomepageMoviesDTO>> GetHomepageMovies()
@@ -444,6 +453,108 @@ namespace Movies.Services.Movies_Service
             response.Success = true;
             response.Message = "Reviews are fetched successfully";
 
+            return response;
+        }
+
+        public async Task<ServiceResponse<int>> AddMovieByAdmin(AddMovieDTO dto)
+        {
+            //throw new NotImplementedException();
+            string PhotoUrl = "";
+
+            ServiceResponse<int> response = new ServiceResponse<int>();
+
+            var user = await _usermanager.FindByIdAsync(GetUserId());
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "No user found";
+                return response;
+
+            }
+
+
+            var movie = await _context.Movies.FirstOrDefaultAsync(
+                m => m.Title.ToLower() == dto.Title.Trim().ToLower()
+            );
+
+            if (!(movie is null))
+            {
+                response.Success = false;
+                response.Message = "The movie already exists";
+                return response;
+            }
+
+            var imageUploadResult = await _cloudinaryService.UploadMovieImageAsync(dto.Photo, dto.Title, dto.GenreId);
+
+            if (imageUploadResult.Error == null) PhotoUrl = imageUploadResult.SecureUrl.ToString();
+
+            var newMovie = new Movie
+            {
+                Title = dto.Title,
+                GenreId = dto.GenreId,
+                Description = dto.Description,
+                Rating = dto.Rating,
+                ReleaseDate = new DateTime(dto.ReleaseDate,1,1),
+                PhotoUrl = PhotoUrl,
+                
+
+            };
+
+            _context.Movies.Add(newMovie);
+            _context.SaveChanges();
+
+            if (dto.ActorIds != null)
+            {
+                foreach (var actorId in dto.ActorIds)
+                {
+                    var actor = _context.Actors.Find(actorId);
+                    if (actor != null)
+                    {
+                        var actorMovie = new ActorMovie
+                        {
+                            Actor = actor,
+                            Movie = newMovie,
+                        };
+                        _context.ActorMovie.Add(actorMovie);
+                    }
+                }
+                _context.SaveChanges();
+            }
+
+            response.Data = newMovie.MovieId;
+            response.Success = true;
+            response.Message = "Movie has been added successfully";
+            return response;
+
+
+        }
+
+        public Task<ServiceResponseWithoutData> DeleteMovieByAdmin(int movieId)
+        {
+            throw new NotImplementedException();
+        }
+
+        private String GetUserId() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        public async Task<ServiceResponse<List<ActorNamesDTO>>> GetActorNames()
+        {
+            var response = new ServiceResponse<List<ActorNamesDTO>>();
+            var actors = await _context.Actors.Select(a => new ActorNamesDTO
+            {
+                Id = a.ActorId,
+                Name = a.ActorName
+            }).ToListAsync();
+
+            //if (actors is null)
+            //{
+            //    response.Success = false;
+            //    response.Message = "There are no actors to fetch";
+            //    return response;
+            //}
+
+            response.Data = actors;
+            response.Success = true;
+            response.Message = "Actors are fetched successfully";
             return response;
         }
     }

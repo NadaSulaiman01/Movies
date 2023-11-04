@@ -1,4 +1,5 @@
 using Movies.Custom_Middleware;
+using Movies.Validators.Movie_Validators;
 using Swashbuckle.AspNetCore.Filters;
 
 
@@ -24,6 +25,9 @@ builder.Services.AddTransient<IValidator<SignUpRequestDTO>, SignUpValidator>();
 //Configure Review validators
 builder.Services.AddTransient<IValidator<AddReviewDTO>, AddReviewValidator>();
 builder.Services.AddTransient<IValidator<EditReviewDTO>, EditReviewValidator>();
+
+//Configure Movie validators
+builder.Services.AddTransient<IValidator<AddMovieDTO>, AddMovieValidator>();
 
 // Add CORS configuration
 builder.Services.AddCors(options =>
