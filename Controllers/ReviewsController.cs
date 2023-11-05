@@ -84,5 +84,15 @@ namespace Movies.Controllers
             return Ok(response);
 
         }
+
+        [Authorize(Roles = AppRolesConstants.Admin)]
+        [HttpDelete("DeleteReviewByAdmin")]
+        public async Task<ActionResult<ServiceResponse<ReviewDTO>>> DeleteReviewByAdmin(int reviewId)
+        {
+
+            var response = await _reviewService.DeleteReviewByAdmin(reviewId);
+            return Ok(response);
+
+        }
     }
 }

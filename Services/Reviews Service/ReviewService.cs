@@ -167,5 +167,56 @@ namespace Movies.Services.Reviews_Service
             return response;
 
         }
+
+        public async Task<ServiceResponseWithoutData> DeleteReviewByAdmin(int reviewId)
+        {
+            //throw new NotImplementedException();
+            var response = new ServiceResponseWithoutData();
+
+            //check if the current user is registered in the database
+            var user = await _usermanager.FindByIdAsync(GetUserId());
+
+
+            if (user is null)
+            {
+                response.Success = false;
+                response.Message = "user wasn't found!";
+                return response;
+            }
+
+
+            var role = "User";
+            var userRole = await _usermanager.IsInRoleAsync(user, AppRolesConstants.Admin);
+            if (userRole)
+            {
+                role = AppRolesConstants.Admin;
+
+            } else
+            {
+                response.Success = false;
+                response.Message = "You are unothorized to do this action";
+                return response;
+
+            }
+
+
+
+            var review = await _context.Reviews.SingleOrDefaultAsync(r => r.ReviewId == reviewId);
+
+            if (review is null)
+            {
+                response.Success = false;
+                response.Message = "No Review was found with this id!";
+                return response;
+            }
+
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Review was deleted successfuly!";
+            return response;
+        }
     }
 }
