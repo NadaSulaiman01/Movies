@@ -529,9 +529,26 @@ namespace Movies.Services.Movies_Service
 
         }
 
-        public Task<ServiceResponseWithoutData> DeleteMovieByAdmin(int movieId)
+        public async Task<ServiceResponseWithoutData> DeleteMovieByAdmin(int movieId)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            var response = new ServiceResponseWithoutData();
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.MovieId == movieId);
+
+            if(movie is null)
+            {
+                response.Success = false;
+                response.Message = "Inavlid movie Id";
+                return response;
+            }
+
+            _context.Movies.Remove(movie);
+            await _context.SaveChangesAsync();
+            response.Success = true;
+            response.Message = "Movie deleted successfully";
+            return response;
+
+
         }
 
         private String GetUserId() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);

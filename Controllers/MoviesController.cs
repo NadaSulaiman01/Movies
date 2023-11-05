@@ -190,6 +190,16 @@ namespace Movies.Controllers
 
         }
 
+        [Authorize(Roles = AppRolesConstants.Admin)]
+        [HttpDelete("DeleteMovieByAdmin")]
+        public async Task<ActionResult<ServiceResponse<ReviewDTO>>> DeleteMovieByAdmin(int movieId)
+        {
+
+            var response = await _movieService.DeleteMovieByAdmin(movieId);
+            return Ok(response);
+
+        }
+
 
         private ServiceResponseWithoutData checkPagination(int page, int pageSize)
         {
