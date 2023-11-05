@@ -37,7 +37,8 @@ builder.Services.AddCors(options =>
         builder.WithOrigins("http://localhost:4200") // Update this with your actual frontend URL
                .AllowAnyMethod()
                .AllowAnyHeader()
-               .AllowCredentials();
+               .AllowCredentials()
+               .WithMethods("OPTIONS");
     });
 });
 
@@ -82,6 +83,9 @@ builder.Services.AddAuthentication(auth =>
 });
 
 
+builder.Services.AddAuthorization();
+
+
 builder.Services.AddSwaggerGen(c => {
     c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
@@ -110,7 +114,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowFrontend"); // Enable CORS before other middleware
+app.UseCors("AllowFrontend"); 
 
 app.UseMiddleware<CustomErrorResponseMiddleware>();
 

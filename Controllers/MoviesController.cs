@@ -158,7 +158,7 @@ namespace Movies.Controllers
 
         [Authorize(Roles = AppRolesConstants.Admin)]
         [HttpPost("AddMovie")]
-        public async Task<ActionResult<ServiceResponse<int>>> AddMovieByAdmin(AddMovieDTO dto)
+        public async Task<ActionResult<ServiceResponse<int>>> AddMovieByAdmin ([FromForm] AddMovieDTO dto)
         {
             var validationResult = _addMovieValidator.Validate(dto);
 
