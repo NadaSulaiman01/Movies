@@ -18,6 +18,8 @@ namespace Movies.Services.Movies_Service
         Task<ServiceResponse<int>> AddMovieByAdmin(AddMovieDTO dto);
         Task<ServiceResponseWithoutData> DeleteMovieByAdmin(int movieId);
         Task<ServiceResponse<List<ActorNamesDTO>>> GetActorNames();
+        Task<ServiceResponse<MovieWithoutReviewsDTO>> GetMovieWithoutReviews(int movieId);
+
 
 
 

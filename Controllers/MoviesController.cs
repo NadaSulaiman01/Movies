@@ -200,6 +200,15 @@ namespace Movies.Controllers
 
         }
 
+        [HttpGet("GetMovieWithoutReviews")]
+        public async Task<ActionResult<ServiceResponse<MovieWithoutReviewsDTO>>> GetMovieWithoutReviews(int movieId)
+        {
+            var response = new ServiceResponse<MovieWithoutReviewsDTO>();
+            response = await _movieService.GetMovieWithoutReviews(movieId);
+            return Ok(response);
+
+        }
+
 
         private ServiceResponseWithoutData checkPagination(int page, int pageSize)
         {
