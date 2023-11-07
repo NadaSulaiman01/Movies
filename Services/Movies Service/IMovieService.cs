@@ -19,6 +19,7 @@ namespace Movies.Services.Movies_Service
         Task<ServiceResponseWithoutData> DeleteMovieByAdmin(int movieId);
         Task<ServiceResponse<List<ActorNamesDTO>>> GetActorNames();
         Task<ServiceResponse<MovieWithoutReviewsDTO>> GetMovieWithoutReviews(int movieId);
+        Task<ServiceResponse<int>> EditMovieByAdmin(EditMovieDTO dto);
 
 
 

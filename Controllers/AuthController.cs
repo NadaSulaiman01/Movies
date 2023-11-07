@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Movies.DTOs.AuthDTOs;
 using Movies.Services.Auth_Service;
 using Movies.Validators.Auth_Validators;
+using System.Web.Http.Results;
 
 namespace Movies.Controllers
 {
@@ -45,9 +46,12 @@ namespace Movies.Controllers
             }
 
             var response = await _authService.LoginUserAsync(request);
-
+            if(response.Success) {
+                SetRefreshTokenInCookie(response.Data!.RefreshToken, response.Data.RefreshTokenExpiration);
+                //SetRefreshTokenInCookie("vvvvv", new DateTime());
+            }
+            
             return Ok(response);
-
         }
 
         [HttpPost("signup")]
@@ -73,6 +77,11 @@ namespace Movies.Controllers
             }
 
             var response = await _authService.RegisterUserAsync(request);
+            if (response.Success)
+            {
+                SetRefreshTokenInCookie(response.Data!.RefreshToken, response.Data.RefreshTokenExpiration);
+                //SetRefreshTokenInCookie("vvvvv", new DateTime());
+            }
 
             return Ok(response);
 
@@ -113,8 +122,18 @@ namespace Movies.Controllers
             {
                 HttpOnly = true,
                 Expires = expires.ToLocalTime(),
-                SameSite = SameSiteMode.None,
+                SameSite = SameSiteMode.Lax,
                 Secure = true
+
+
+                //Add these to allow front end to work
+                //SameSite = SameSiteMode.Lax,
+                //Secure = true
+
+
+                //remove those to make it work in swagger again:
+                //SameSite = SameSiteMode.Lax,
+                //Secure = false
             };
 
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);

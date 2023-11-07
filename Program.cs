@@ -28,17 +28,18 @@ builder.Services.AddTransient<IValidator<EditReviewDTO>, EditReviewValidator>();
 
 //Configure Movie validators
 builder.Services.AddTransient<IValidator<AddMovieDTO>, AddMovieValidator>();
+builder.Services.AddTransient<IValidator<EditMovieDTO>, EditMovieValidator>();
 
 // Add CORS configuration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", builder =>
     {
-        builder.WithOrigins("http://localhost:4200") // Update this with your actual frontend URL
+        builder.WithOrigins("https://localhost:4200") // Update this with your actual frontend URL
                .AllowAnyMethod()
                .AllowAnyHeader()
-               .AllowCredentials()
-               .WithMethods("OPTIONS");
+               .AllowCredentials();
+               //.WithMethods("OPTIONS");
     });
 });
 

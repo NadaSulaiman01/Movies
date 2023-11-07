@@ -567,20 +567,17 @@ namespace Movies.Services.Movies_Service
 
             if (rowsAffected > 0)
             {
-
-
                 if (!string.IsNullOrEmpty(photoPath) || string.IsNullOrEmpty(photoUrl))
                 {
                     await _cloudinaryService.DeleteImageAsync(photoPath);
                     response.Success = true;
                     response.Message = "Movie has been deleted successfully.";
                     return response;
-
                 }
-
             }
             response.Success = true;
-            response.Message = "Movie has been deleted successfully but image was not deleted from cloudinary.";
+            response.Message =
+                "Movie has been deleted successfully but image was not deleted from cloudinary.";
             return response;
         }
 
@@ -607,7 +604,9 @@ namespace Movies.Services.Movies_Service
             return response;
         }
 
-        public async Task<ServiceResponse<MovieWithoutReviewsDTO>> GetMovieWithoutReviews(int movieId)
+        public async Task<ServiceResponse<MovieWithoutReviewsDTO>> GetMovieWithoutReviews(
+            int movieId
+        )
         {
             //throw new NotImplementedException();
             var response = new ServiceResponse<MovieWithoutReviewsDTO>();
@@ -631,30 +630,23 @@ namespace Movies.Services.Movies_Service
             dto.Rating = movie.Rating;
             dto.ReleaseDate = DateExtractor.ExtractYear(movie.ReleaseDate);
             dto.PhotoUrl = movie.PhotoUrl;
-            dto.Genre = new GenreNameDTO { GenreId = movie.GenreId, GenreName = movie.Genre.Name } ;
+            dto.Genre = new GenreNameDTO { GenreId = movie.GenreId, GenreName = movie.Genre.Name };
             dto.Actors = new List<ActorNamesDTO>();
             if (!(movie.ActorMovies is null))
             {
                 foreach (var am in movie.ActorMovies)
                 {
-                    dto.Actors.Add(new ActorNamesDTO
-                    {
-                        Id = am.ActorId,
-                        Name = am.Actor.ActorName
-                    });
+                    dto.Actors.Add(
+                        new ActorNamesDTO { Id = am.ActorId, Name = am.Actor.ActorName }
+                    );
                 }
-
             }
-
-
-
 
             response.Data = dto;
             response.Success = true;
             response.Message = "Movie data is fetched successfully";
             return response;
         }
-
 
         private String GetPhotoPath(string publicID)
         {
@@ -667,17 +659,14 @@ namespace Movies.Services.Movies_Service
                 {
                     if (publicID.Substring(i, 6) == movies)
                     {
-
                         resultOne = publicID.Substring(i);
                         break;
-
                     }
                 }
                 else
                 {
                     return "";
                 }
-
             }
             int count = 0;
             if (!string.IsNullOrEmpty(resultOne))
@@ -689,15 +678,102 @@ namespace Movies.Services.Movies_Service
                     {
                         resultTwo = resultOne.Substring(0, resultOne.Length - count);
                         break;
-
-
                     }
                 }
             }
             return resultTwo;
         }
 
+        public async Task<ServiceResponse<int>> EditMovieByAdmin(EditMovieDTO dto)
+        {
+            //throw new NotImplementedException();
+            var response = new ServiceResponse<int>();
+            var movie = await _context.Movies
+                .Include(m => m.Genre)
+                .Include(m => m.ActorMovies)
+                .FirstOrDefaultAsync(m => m.MovieId == dto.Id);
 
+            if (movie is null)
+            {
+                response.Success = false;
+                response.Message = "Inavlid movie Id";
+                return response;
+            }
 
+            //var movieWithSameData = await _context.Movies
+            //    .Where(
+            //        m =>
+            //            (m.MovieId != dto.Id)
+            //            && (
+            //                (m.Title.ToLower().Trim()) == (dto.Title.ToLower().Trim())
+            //                && (DateExtractor.ExtractYear(m.ReleaseDate) == (dto.ReleaseDate))
+            //            )
+            //    )
+            //    .FirstOrDefaultAsync();
+
+            var movies = await _context.Movies.Where(m => m.MovieId != dto.Id).ToListAsync();
+
+            var movieWithSameData = movies.FirstOrDefault(
+                m =>
+                    m.Title.ToLower().Trim() == dto.Title.ToLower().Trim()
+                    && DateExtractor.ExtractYear(m.ReleaseDate) == dto.ReleaseDate
+            );
+
+            if (movieWithSameData != null)
+            {
+                response.Success = false;
+                response.Message = "Another Movie with the same name and release year exists.";
+                return response;
+            }
+
+            movie.Title = dto.Title.Trim();
+            movie.Description = dto.Description.Trim();
+            movie.ReleaseDate = new DateTime(dto.ReleaseDate, 1, 1);
+            movie.Rating = dto.Rating;
+            movie.GenreId = dto.GenreId;
+            movie.ActorMovies = dto.ActorIds
+                .Select(id => new ActorMovie { MovieId = movie.MovieId, ActorId = id })
+                .ToList();
+
+            if (!(dto.Photo is null))
+            {
+                var imageUploadResult = await _cloudinaryService.UploadMovieImageAsync(
+                    dto.Photo,
+                    dto.Title,
+                    dto.GenreId
+                );
+
+                if (imageUploadResult.Error == null)
+                {
+                    string photoUrl = movie.PhotoUrl;
+                    string photoPath = GetPhotoPath(photoUrl);
+                    if (!string.IsNullOrEmpty(photoPath) || string.IsNullOrEmpty(photoUrl))
+                    {
+                        movie.PhotoUrl = imageUploadResult.SecureUrl.ToString();
+                         _cloudinaryService.DeleteImageAsync(photoPath);
+                        
+
+                    }
+                    else
+                    {
+                        movie.PhotoUrl = imageUploadResult.SecureUrl.ToString();
+                    }
+                }
+                else
+                {
+                    response.Success = false;
+                    response.Message = "There was a problem uploading the new poster";
+                    return response;
+                }
+            }
+
+            _context.Movies.Update(movie);
+            await _context.SaveChangesAsync();
+
+            response.Data = movie.MovieId;
+            response.Success = true;
+            response.Message = "The Movie has been edited successfully";
+            return response;
+        }
     }
 }

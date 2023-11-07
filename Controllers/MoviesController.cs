@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Movies.DTOs.AuthDTOs;
 using Movies.Services.Movies_Service;
 using Movies.Validators.Review_Validators;
+using System.Collections.ObjectModel;
 
 namespace Movies.Controllers
 {
@@ -14,11 +15,15 @@ namespace Movies.Controllers
     {
         private readonly IMovieService _movieService;
         private readonly IValidator<AddMovieDTO> _addMovieValidator;
+        private readonly IValidator<EditMovieDTO> _editMovieValidator;
+        private static readonly IList<string> _allowedExtenstions = new ReadOnlyCollection<string>(new List<string> { ".jpg", ".png", ".gif", ".jpeg" });
+        private const long _MaxAllowedPhotoSize = 1048576;
 
-        public MoviesController(IMovieService movieService, IValidator<AddMovieDTO> addMovieValidator)
+        public MoviesController(IMovieService movieService, IValidator<AddMovieDTO> addMovieValidator, IValidator<EditMovieDTO> editMovieValidator)
         {
             _movieService = movieService;
             _addMovieValidator = addMovieValidator;
+            _editMovieValidator = editMovieValidator;
         }
 
         [HttpGet]
@@ -177,7 +182,51 @@ namespace Movies.Controllers
                 return Ok(validationResponse);
             }
 
+
+            var validImage = new ServiceResponseWithoutData();
+
+            if (!_allowedExtenstions.Contains(Path.GetExtension(dto.Photo.FileName).ToLower()))
+            {
+                validImage.Success = false;
+                validImage.Message = "Only .png, .jpg,.gif photo extensions are allowed!";
+                return Ok(validImage);
+            }
+
+            if (dto.Photo.Length > _MaxAllowedPhotoSize)
+            {
+                validImage.Success = false;
+                validImage.Message = "Maximum Photo size allowed is 1MB!";
+                return Ok(validImage);
+            }
+
+
+
             var response = await _movieService.AddMovieByAdmin(dto);
+            return Ok(response);
+        }
+
+        [Authorize(Roles = AppRolesConstants.Admin)]
+        [HttpPut("EditMovie")]
+        public async Task<ActionResult<ServiceResponse<int>>> EditMovieByAdmin([FromForm] EditMovieDTO dto)
+        {
+            var validationResult = _editMovieValidator.Validate(dto);
+
+            // Check if the validation failed
+            if (!validationResult.IsValid)
+            {
+                string errorMessage = string.Join(", ", validationResult.Errors);
+
+
+                var validationResponse = new ServiceResponseWithoutData
+                {
+                    Success = false,
+                    Message = errorMessage
+                };
+
+                return Ok(validationResponse);
+            }
+
+            var response = await _movieService.EditMovieByAdmin(dto);
             return Ok(response);
         }
 

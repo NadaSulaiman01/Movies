@@ -134,11 +134,14 @@ namespace Movies.Services.Auth_Service
         {
 
             var response = new ServiceResponse<AuthResponseDTO>();
+            Console.WriteLine("Hellooooooooooooooooooooo");
             var user = await _usermanager.Users.SingleOrDefaultAsync(u => u.RefreshTokens!.Any(t => t.Token == refreshToken));
+            Console.WriteLine(user?.UserName);
+            Console.WriteLine("Another hello");
             if (user == null)
             {
                 response.Success = false;
-                response.Message = "Invalid refresh token";
+                response.Message = "Invalidddddddddd refresh token" + refreshToken + "Was anything printed?";
                 return response;
             }
  
@@ -207,7 +210,7 @@ namespace Movies.Services.Auth_Service
             {
                 Subject = new ClaimsIdentity(claims),
                 SigningCredentials = creds,
-                Expires = DateTime.UtcNow.AddHours(1)
+                Expires = DateTime.UtcNow.AddMinutes(15)
 
             };
             expiration = tokenDescriptor.Expires;
