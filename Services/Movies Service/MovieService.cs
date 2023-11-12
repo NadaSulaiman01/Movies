@@ -569,7 +569,7 @@ namespace Movies.Services.Movies_Service
             {
                 if (!string.IsNullOrEmpty(photoPath) || string.IsNullOrEmpty(photoUrl))
                 {
-                    await _cloudinaryService.DeleteImageAsync(photoPath);
+                    _cloudinaryService.DeleteImageAsync(photoPath);
                     response.Success = true;
                     response.Message = "Movie has been deleted successfully.";
                     return response;

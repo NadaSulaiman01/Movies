@@ -14,7 +14,8 @@
 
             if (elapsedTime.TotalSeconds < 60)
             {
-                timeAgoString = string.Format("{0} second{1} ago", (int)elapsedTime.TotalSeconds, (int)elapsedTime.TotalSeconds == 1 ? "" : "s");
+                //timeAgoString = string.Format("{0} second{1} ago", (int)elapsedTime.TotalSeconds, (int)elapsedTime.TotalSeconds == 1 ? "" : "s");
+                return "Just now";
             }
             else if (elapsedTime.TotalMinutes < 60)
             {

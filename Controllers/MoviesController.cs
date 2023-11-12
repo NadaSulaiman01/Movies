@@ -71,30 +71,27 @@ namespace Movies.Controllers
         }
 
         //GetMoviesBySearchName
-
         [HttpGet("GetMoviesBySearchName")]
-        public async Task<ActionResult<ServiceResponse<MoviesListDTO>>> GetMoviesBySearchName(string searchInput, int page, int pageSize)
+        public async Task<ActionResult<ServiceResponse<MoviesListDTO>>> GetMoviesBySearchName(int page, int pageSize, string? searchInput = "")
         {
-            if (string.IsNullOrEmpty(searchInput))
+            
+            if (string.IsNullOrWhiteSpace(searchInput))
             {
-                var unvalidResult = new ServiceResponseWithoutData()
-                {
-                    Success = false,
-                    Message = "Search input is null or empty"
-                };
+                searchInput = "";
             }
+
             var paginationCheck = checkPagination(page, pageSize);
             if (!paginationCheck.Success)
             {
                 return Ok(paginationCheck);
             }
             var response = new ServiceResponse<MoviesListDTO>();
+            Console.WriteLine(searchInput);
             response = await _movieService.GetMoviesBySearchName(searchInput, page, pageSize);
             return Ok(response);
         }
 
         //GetMoviesSuggestions
-
         [HttpGet("GetMoviesSuggestions")]
         public async Task<ActionResult<ServiceResponse<List<MovieNameDTO>>>> GetMoviesSuggestions(string searchInput)
         {
