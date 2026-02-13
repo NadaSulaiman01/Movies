@@ -1,0 +1,30 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+
+# Publish folder
+publish/
+
+# Node (if Angular inside project)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
