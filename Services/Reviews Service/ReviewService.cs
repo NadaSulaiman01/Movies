@@ -7,13 +7,13 @@ namespace Movies.Services.Reviews_Service
 {
     public class ReviewService : IReviewService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IReviewRepository _reviewRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<ApplicationUser> _usermanager;
 
-        public ReviewService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> usermanager)
+        public ReviewService(IReviewRepository reviewRepository, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> usermanager)
         {
-            _context = context;
+            _reviewRepository = reviewRepository;
             _httpContextAccessor = httpContextAccessor;
             _usermanager = usermanager;
         }
@@ -37,7 +37,7 @@ namespace Movies.Services.Reviews_Service
                 return response;
             }
 
-            var movie = await _context.Movies.SingleOrDefaultAsync(m => m.MovieId == dto.MovieId);
+            var movie = await _reviewRepository.Movies.SingleOrDefaultAsync(m => m.MovieId == dto.MovieId);
             if (movie is null)
             {
                 response.Success = false;
@@ -55,9 +55,9 @@ namespace Movies.Services.Reviews_Service
 
             };
 
-            await _context.AddAsync(review);
+            await _reviewRepository.AddReviewAsync(review);
 
-            await _context.SaveChangesAsync();
+            await _reviewRepository.SaveChangesAsync();
 
             response.Data = new ReviewDTO
             {
@@ -90,7 +90,7 @@ namespace Movies.Services.Reviews_Service
                 return response;
             }
 
-            var review = await _context.Reviews.SingleOrDefaultAsync(r => r.ReviewId == reviewId);
+            var review = await _reviewRepository.Reviews.SingleOrDefaultAsync(r => r.ReviewId == reviewId);
 
             if (review == null)
             {
@@ -108,7 +108,7 @@ namespace Movies.Services.Reviews_Service
 
             review.Content = dto.Content;
 
-            await _context.SaveChangesAsync();
+            await _reviewRepository.SaveChangesAsync();
 
             response.Data = new ReviewDTO
             {
@@ -142,7 +142,7 @@ namespace Movies.Services.Reviews_Service
 
 
 
-            var review = await _context.Reviews.SingleOrDefaultAsync(r => r.ReviewId == reviewId);
+            var review = await _reviewRepository.Reviews.SingleOrDefaultAsync(r => r.ReviewId == reviewId);
 
             if (review is null)
             {
@@ -159,8 +159,8 @@ namespace Movies.Services.Reviews_Service
             }
 
            
-            _context.Reviews.Remove(review);
-            await _context.SaveChangesAsync();
+            await _reviewRepository.RemoveReviewAsync(review);
+            await _reviewRepository.SaveChangesAsync();
 
             response.Success = true;
             response.Message = "Review was deleted successfuly!";
@@ -201,7 +201,7 @@ namespace Movies.Services.Reviews_Service
 
 
 
-            var review = await _context.Reviews.SingleOrDefaultAsync(r => r.ReviewId == reviewId);
+            var review = await _reviewRepository.Reviews.SingleOrDefaultAsync(r => r.ReviewId == reviewId);
 
             if (review is null)
             {
@@ -211,8 +211,8 @@ namespace Movies.Services.Reviews_Service
             }
 
 
-            _context.Reviews.Remove(review);
-            await _context.SaveChangesAsync();
+            await _reviewRepository.RemoveReviewAsync(review);
+            await _reviewRepository.SaveChangesAsync();
 
             response.Success = true;
             response.Message = "Review was deleted successfuly!";

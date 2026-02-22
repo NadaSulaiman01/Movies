@@ -9,19 +9,19 @@ namespace Movies.Services.Movies_Service
 {
     public class MovieService : IMovieService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IMovieRepository _movieRepository;
         private readonly UserManager<ApplicationUser> _usermanager;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public MovieService(
-            ApplicationDbContext context,
+            IMovieRepository movieRepository,
             UserManager<ApplicationUser> usermanager,
             ICloudinaryService cloudinaryService,
             IHttpContextAccessor httpContextAccessor
         )
         {
-            _context = context;
+            _movieRepository = movieRepository;
             _usermanager = usermanager;
             _cloudinaryService = cloudinaryService;
             _httpContextAccessor = httpContextAccessor;
@@ -31,7 +31,7 @@ namespace Movies.Services.Movies_Service
         {
             //throw new NotImplementedException();
             var response = new ServiceResponse<GetHomepageMoviesDTO>();
-            var genres = await _context.Genres
+            var genres = await _movieRepository.Genres
                 .Select(g => new GenreDTO { GenreId = g.GenreId, GenreName = g.Name, })
                 .AsNoTracking()
                 .ToListAsync();
@@ -47,7 +47,7 @@ namespace Movies.Services.Movies_Service
 
             foreach (var genre in genres)
             {
-                var movies = await _context.Movies
+                var movies = await _movieRepository.Movies
                     .Where(m => m.GenreId == genre.GenreId)
                     .Select(
                         m =>
@@ -82,7 +82,7 @@ namespace Movies.Services.Movies_Service
         {
             var response = new ServiceResponse<FullMovieDTO>();
 
-            var movie = await _context.Movies
+            var movie = await _movieRepository.Movies
                 .Where(m => m.MovieId == movieId)
                 .Include(m => m.Genre)
                 .Include(m => m.Reviews)
@@ -153,7 +153,7 @@ namespace Movies.Services.Movies_Service
         {
             var response = new ServiceResponse<MoviesListDTO>();
 
-            var genre = await _context.Genres.FirstOrDefaultAsync(g => g.GenreId == genreId);
+            var genre = await _movieRepository.Genres.FirstOrDefaultAsync(g => g.GenreId == genreId);
             if (genre is null)
             {
                 response.Success = false;
@@ -164,7 +164,7 @@ namespace Movies.Services.Movies_Service
             var skipAmount = (page - 1) * pageSize;
 
             // Query the database to retrieve movies for the specified genre and apply pagination
-            var movies = await _context.Movies
+            var movies = await _movieRepository.Movies
                 .Where(m => m.GenreId == genreId)
                 .Select(
                     m =>
@@ -186,7 +186,7 @@ namespace Movies.Services.Movies_Service
                 .ToListAsync();
 
             // Calculate the total count of movies for this genre
-            var totalMovies = await _context.Movies.Where(m => m.GenreId == genreId).CountAsync();
+            var totalMovies = await _movieRepository.Movies.Where(m => m.GenreId == genreId).CountAsync();
 
             var moviesListDTO = new MoviesListDTO();
             moviesListDTO.Movies = movies;
@@ -207,7 +207,7 @@ namespace Movies.Services.Movies_Service
             var skipAmount = (page - 1) * pageSize;
 
             // Query the database to retrieve movies for the specified genre and apply pagination
-            var movies = await _context.Movies
+            var movies = await _movieRepository.Movies
                 .Include(m => m.Genre)
                 .Select(
                     m =>
@@ -229,7 +229,7 @@ namespace Movies.Services.Movies_Service
                 .ToListAsync();
 
             // Calculate the total count of movies for this genre
-            var totalMovies = await _context.Movies.CountAsync();
+            var totalMovies = await _movieRepository.Movies.CountAsync();
 
             var moviesListDTO = new MoviesListDTO();
             moviesListDTO.Movies = movies;
@@ -253,7 +253,7 @@ namespace Movies.Services.Movies_Service
             // Calculate the number of items to skip based on the page and page size
             var skipAmount = (page - 1) * pageSize;
 
-            var movies = await _context.Movies
+            var movies = await _movieRepository.Movies
                 .Include(m => m.Genre)
                 .Select(
                     m =>
@@ -276,7 +276,7 @@ namespace Movies.Services.Movies_Service
                 .AsNoTracking()
                 .ToListAsync();
 
-            var totalMovies = await _context.Movies
+            var totalMovies = await _movieRepository.Movies
                 .Where(m => m.Title.Contains(searchInput))
                 .CountAsync();
 
@@ -297,7 +297,7 @@ namespace Movies.Services.Movies_Service
         {
             var response = new ServiceResponse<List<MovieNameDTO>>();
 
-            var movies = await _context.Movies
+            var movies = await _movieRepository.Movies
                 .Select(m => new MovieNameDTO { MovieId = m.MovieId, MovieTitle = m.Title, })
                 .Where(m => m.MovieTitle.StartsWith(searchInput))
                 .OrderBy(m => m.MovieTitle)
@@ -317,7 +317,7 @@ namespace Movies.Services.Movies_Service
         public async Task<ServiceResponse<List<GenreNameDTO>>> GetGenreNames()
         {
             var response = new ServiceResponse<List<GenreNameDTO>>();
-            var genre = await _context.Genres
+            var genre = await _movieRepository.Genres
                 .Select(g => new GenreNameDTO { GenreId = g.GenreId, GenreName = g.Name })
                 .ToListAsync();
 
@@ -339,7 +339,7 @@ namespace Movies.Services.Movies_Service
             //throw new NotImplementedException();
             var response = new ServiceResponse<List<MovieNameDTO>>();
 
-            var movies = await _context.Movies
+            var movies = await _movieRepository.Movies
                 .Select(m => new MovieNameDTO { MovieId = m.MovieId, MovieTitle = m.Title, })
                 .OrderBy(m => m.MovieTitle)
                 .AsNoTracking()
@@ -359,7 +359,7 @@ namespace Movies.Services.Movies_Service
         {
             var response = new ServiceResponse<ShortMovieDTO>();
 
-            var movie = await _context.Movies
+            var movie = await _movieRepository.Movies
                 .Include(m => m.Genre)
                 .Where(m => m.MovieId == movieId)
                 .Select(
@@ -397,7 +397,7 @@ namespace Movies.Services.Movies_Service
             // throw new NotImplementedException();
             var response = new ServiceResponse<List<ShortActorDTO>>();
 
-            bool movieExists = await _context.Movies.AnyAsync(m => m.MovieId == movieId);
+            bool movieExists = await _movieRepository.Movies.AnyAsync(m => m.MovieId == movieId);
 
             if (!movieExists)
             {
@@ -406,7 +406,7 @@ namespace Movies.Services.Movies_Service
                 return response;
             }
 
-            var actors = await _context.ActorMovie
+            var actors = await _movieRepository.ActorMovies
                 .Where(a => a.MovieId == movieId)
                 .Include(a => a.Actor)
                 .Select(
@@ -437,7 +437,7 @@ namespace Movies.Services.Movies_Service
             //throw new NotImplementedException();
             var response = new ServiceResponse<MovieReviewsDTO>();
 
-            bool movieExists = await _context.Movies.AnyAsync(m => m.MovieId == movieId);
+            bool movieExists = await _movieRepository.Movies.AnyAsync(m => m.MovieId == movieId);
 
             if (!movieExists)
             {
@@ -448,7 +448,7 @@ namespace Movies.Services.Movies_Service
 
             var skipAmount = (page - 1) * pageSize;
 
-            var reviews = await _context.Reviews
+            var reviews = await _movieRepository.Reviews
                 .Where(a => a.MovieId == movieId)
                 .Include(r => r.User)
                 .OrderByDescending(r => r.TimeCreated)
@@ -468,7 +468,7 @@ namespace Movies.Services.Movies_Service
                 .Take(pageSize)
                 .ToListAsync();
 
-            int reviewsCount = await _context.Reviews.Where(a => a.MovieId == movieId).CountAsync();
+            int reviewsCount = await _movieRepository.Reviews.Where(a => a.MovieId == movieId).CountAsync();
 
             response.Data = new MovieReviewsDTO();
 
@@ -495,7 +495,7 @@ namespace Movies.Services.Movies_Service
                 return response;
             }
 
-            var movie = await _context.Movies.FirstOrDefaultAsync(
+            var movie = await _movieRepository.Movies.FirstOrDefaultAsync(
                 m => m.Title.ToLower() == dto.Title.Trim().ToLower()
             );
 
@@ -525,21 +525,21 @@ namespace Movies.Services.Movies_Service
                 PhotoUrl = PhotoUrl,
             };
 
-            _context.Movies.Add(newMovie);
-            _context.SaveChanges();
+            await _movieRepository.AddMovieAsync(newMovie);
+            await _movieRepository.SaveChangesAsync();
 
             if (dto.ActorIds != null)
             {
                 foreach (var actorId in dto.ActorIds)
                 {
-                    var actor = _context.Actors.Find(actorId);
+                    var actor = await _movieRepository.FindActorByIdAsync(actorId);
                     if (actor != null)
                     {
                         var actorMovie = new ActorMovie { Actor = actor, Movie = newMovie, };
-                        _context.ActorMovie.Add(actorMovie);
+                        await _movieRepository.AddActorMovieAsync(actorMovie);
                     }
                 }
-                _context.SaveChanges();
+                await _movieRepository.SaveChangesAsync();
             }
 
             response.Data = newMovie.MovieId;
@@ -552,7 +552,7 @@ namespace Movies.Services.Movies_Service
         {
             //throw new NotImplementedException();
             var response = new ServiceResponseWithoutData();
-            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.MovieId == movieId);
+            var movie = await _movieRepository.Movies.FirstOrDefaultAsync(m => m.MovieId == movieId);
 
             if (movie is null)
             {
@@ -562,8 +562,8 @@ namespace Movies.Services.Movies_Service
             }
             string photoUrl = movie.PhotoUrl;
             string photoPath = GetPhotoPath(photoUrl);
-            _context.Movies.Remove(movie);
-            int rowsAffected = await _context.SaveChangesAsync();
+            await _movieRepository.RemoveMovieAsync(movie);
+            int rowsAffected = await _movieRepository.SaveChangesAsync();
 
             if (rowsAffected > 0)
             {
@@ -587,7 +587,7 @@ namespace Movies.Services.Movies_Service
         public async Task<ServiceResponse<List<ActorNamesDTO>>> GetActorNames()
         {
             var response = new ServiceResponse<List<ActorNamesDTO>>();
-            var actors = await _context.Actors
+            var actors = await _movieRepository.Actors
                 .Select(a => new ActorNamesDTO { Id = a.ActorId, Name = a.ActorName })
                 .ToListAsync();
 
@@ -610,7 +610,7 @@ namespace Movies.Services.Movies_Service
         {
             //throw new NotImplementedException();
             var response = new ServiceResponse<MovieWithoutReviewsDTO>();
-            var movie = await _context.Movies
+            var movie = await _movieRepository.Movies
                 .Include(m => m.Genre)
                 .Include(m => m.ActorMovies)
                 .ThenInclude(m => m.Actor)
@@ -688,7 +688,7 @@ namespace Movies.Services.Movies_Service
         {
             //throw new NotImplementedException();
             var response = new ServiceResponse<int>();
-            var movie = await _context.Movies
+            var movie = await _movieRepository.Movies
                 .Include(m => m.Genre)
                 .Include(m => m.ActorMovies)
                 .FirstOrDefaultAsync(m => m.MovieId == dto.Id);
@@ -700,7 +700,7 @@ namespace Movies.Services.Movies_Service
                 return response;
             }
 
-            //var movieWithSameData = await _context.Movies
+            //var movieWithSameData = await _movieRepository.Movies
             //    .Where(
             //        m =>
             //            (m.MovieId != dto.Id)
@@ -711,7 +711,7 @@ namespace Movies.Services.Movies_Service
             //    )
             //    .FirstOrDefaultAsync();
 
-            var movies = await _context.Movies.Where(m => m.MovieId != dto.Id).ToListAsync();
+            var movies = await _movieRepository.Movies.Where(m => m.MovieId != dto.Id).ToListAsync();
 
             var movieWithSameData = movies.FirstOrDefault(
                 m =>
@@ -767,8 +767,8 @@ namespace Movies.Services.Movies_Service
                 }
             }
 
-            _context.Movies.Update(movie);
-            await _context.SaveChangesAsync();
+            await _movieRepository.UpdateMovieAsync(movie);
+            await _movieRepository.SaveChangesAsync();
 
             response.Data = movie.MovieId;
             response.Success = true;
