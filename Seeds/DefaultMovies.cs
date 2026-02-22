@@ -815,19 +815,27 @@ namespace Movies.Seeds
 
         private async Task<string> DownloadImg(string url, string title, int genreId)
         {
-            // Download the image from the URL
-            using var client = new HttpClient();
-            var response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var imageBytes = await response.Content.ReadAsByteArrayAsync();
+            try
+            {
+                // Download the image from the URL
+                using var client = new HttpClient();
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var imageBytes = await response.Content.ReadAsByteArrayAsync();
 
-            // Convert the image to an IFormFile
-            using var imageStream = new MemoryStream(imageBytes);
-            var imageFile = new FormFile(imageStream, 0, imageBytes.Length, null, Path.GetFileName(url));
+                // Convert the image to an IFormFile
+                using var imageStream = new MemoryStream(imageBytes);
+                var imageFile = new FormFile(imageStream, 0, imageBytes.Length, null, Path.GetFileName(url));
 
-            // Upload the image file
-            var uploadResult = await _cloudinaryService.UploadMovieImageAsync(imageFile, title, genreId);
-            return uploadResult.Uri.ToString();
+                // Upload the image file
+                var uploadResult = await _cloudinaryService.UploadMovieImageAsync(imageFile, title, genreId);
+                return uploadResult.Uri.ToString();
+            }
+            catch (Exception ex)
+            {
+
+                return "https://res.cloudinary.com/dhdlvnrup/image/upload/v1771017601/samples/ChatGPT_Image_Feb_13_2026_11_17_58_PM_zaqrme.png";
+            }
 
         }
     }
