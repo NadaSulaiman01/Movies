@@ -16,6 +16,8 @@ global using Microsoft.OpenApi.Models;
 global using Movies.DTOs.AuthDTOs;
 global using Movies.Seeds;
 global using Movies.Services.Auth_Service;
+global using Movies.Repositories.Movies;
+global using Movies.Repositories.Reviews;
 global using FluentValidation;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Movies.Validators.Review_Validators;
