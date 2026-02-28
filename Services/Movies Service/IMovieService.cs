@@ -20,9 +20,5 @@ namespace Movies.Services.Movies_Service
         Task<ServiceResponse<List<ActorNamesDTO>>> GetActorNames();
         Task<ServiceResponse<MovieWithoutReviewsDTO>> GetMovieWithoutReviews(int movieId);
         Task<ServiceResponse<int>> EditMovieByAdmin(EditMovieDTO dto);
-
-
-
-
     }
 }

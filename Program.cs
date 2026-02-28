@@ -1,4 +1,5 @@
 using Movies.Custom_Middleware;
+using Movies.Services.Cache_Service;
 using Movies.Validators.Movie_Validators;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -18,6 +19,14 @@ builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
+builder.Services.AddScoped<MovieService>();
+builder.Services.AddScoped<IMovieService>(sp =>
+{
+    var inner = sp.GetRequiredService<MovieService>();
+    var cache = sp.GetRequiredService<ICacheService>();
+    return new CachedMovieService(inner, cache);
+});
 
 //Add validators
 //Configure Authentication validators
