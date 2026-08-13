@@ -152,6 +152,11 @@ namespace Movies.Services.Movies_Service
             return _inner.GetReviewsByMovieId(movieId, pageNumber, pageSize, skipNumber);
         }
 
+        public Task<ServiceResponse<ReviewSummaryDto>> GetAiReviewSummaryByMovieId(int movieId)
+        {
+            return _inner.GetAiReviewSummaryByMovieId(movieId);
+        }
+
         #endregion
 
         #region ===== Actors =====

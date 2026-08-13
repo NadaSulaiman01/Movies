@@ -158,6 +158,14 @@ namespace Movies.Controllers
             return Ok(response);
         }
 
+        [HttpGet("GetAiReviewSummaryByMovieId")]
+        public async Task<ActionResult<ServiceResponse<ReviewSummaryDto>>> GetAiReviewSummaryByMovieId(int movieId)
+        {
+            var response = new ServiceResponse<ReviewSummaryDto>();
+            response = await _movieService.GetAiReviewSummaryByMovieId(movieId);
+            return Ok(response);
+        }
+
         [Authorize(Roles = AppRolesConstants.Admin)]
         [HttpPost("AddMovie")]
         public async Task<ActionResult<ServiceResponse<int>>> AddMovieByAdmin ([FromForm] AddMovieDTO dto)

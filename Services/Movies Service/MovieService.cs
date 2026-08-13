@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Movies.DTOs.ActorsDTOs;
-using Movies.Models;
-using System.Collections.Generic;
+﻿using Movies.DTOs.ActorsDTOs;
+using Movies.Services.AI_Service;
 using System.Security.Claims;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Movies.Services.Movies_Service
 {
@@ -13,23 +10,26 @@ namespace Movies.Services.Movies_Service
         private readonly UserManager<ApplicationUser> _usermanager;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAiService _aiService;
 
         public MovieService(
             IMovieRepository movieRepository,
             UserManager<ApplicationUser> usermanager,
             ICloudinaryService cloudinaryService,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            IAiService aiService
         )
         {
             _movieRepository = movieRepository;
             _usermanager = usermanager;
             _cloudinaryService = cloudinaryService;
             _httpContextAccessor = httpContextAccessor;
+            _aiService = aiService;
         }
 
         public async Task<ServiceResponse<GetHomepageMoviesDTO>> GetHomepageMovies()
         {
-            //throw new NotImplementedException();
+             
             var response = new ServiceResponse<GetHomepageMoviesDTO>();
             var genres = await _movieRepository.Genres
                 .Select(g => new GenreDTO { GenreId = g.GenreId, GenreName = g.Name, })
@@ -335,8 +335,7 @@ namespace Movies.Services.Movies_Service
         }
 
         public async Task<ServiceResponse<List<MovieNameDTO>>> GetAllMoviesWithoutPagination()
-        {
-            //throw new NotImplementedException();
+        {          
             var response = new ServiceResponse<List<MovieNameDTO>>();
 
             var movies = await _movieRepository.Movies
@@ -434,7 +433,6 @@ namespace Movies.Services.Movies_Service
             int skipNumber
         )
         {
-            //throw new NotImplementedException();
             var response = new ServiceResponse<MovieReviewsDTO>();
 
             bool movieExists = await _movieRepository.Movies.AnyAsync(m => m.MovieId == movieId);
@@ -482,7 +480,6 @@ namespace Movies.Services.Movies_Service
 
         public async Task<ServiceResponse<int>> AddMovieByAdmin(AddMovieDTO dto)
         {
-            //throw new NotImplementedException();
             string PhotoUrl = "";
 
             ServiceResponse<int> response = new ServiceResponse<int>();
@@ -549,8 +546,7 @@ namespace Movies.Services.Movies_Service
         }
 
         public async Task<ServiceResponseWithoutData> DeleteMovieByAdmin(int movieId)
-        {
-            //throw new NotImplementedException();
+        {            
             var response = new ServiceResponseWithoutData();
             var movie = await _movieRepository.Movies.FirstOrDefaultAsync(m => m.MovieId == movieId);
 
@@ -607,8 +603,7 @@ namespace Movies.Services.Movies_Service
         public async Task<ServiceResponse<MovieWithoutReviewsDTO>> GetMovieWithoutReviews(
             int movieId
         )
-        {
-            //throw new NotImplementedException();
+        {            
             var response = new ServiceResponse<MovieWithoutReviewsDTO>();
             var movie = await _movieRepository.Movies
                 .Include(m => m.Genre)
@@ -685,8 +680,7 @@ namespace Movies.Services.Movies_Service
         }
 
         public async Task<ServiceResponse<int>> EditMovieByAdmin(EditMovieDTO dto)
-        {
-            //throw new NotImplementedException();
+        {            
             var response = new ServiceResponse<int>();
             var movie = await _movieRepository.Movies
                 .Include(m => m.Genre)
@@ -773,6 +767,50 @@ namespace Movies.Services.Movies_Service
             response.Data = movie.MovieId;
             response.Success = true;
             response.Message = "The Movie has been edited successfully";
+            return response;
+        }
+
+        public async Task<ServiceResponse<ReviewSummaryDto>> GetAiReviewSummaryByMovieId(int movieId)
+        {
+            var response = new ServiceResponse<ReviewSummaryDto>();
+
+            bool movieExists = await _movieRepository.Movies.AnyAsync(m => m.MovieId == movieId);
+
+            if (!movieExists)
+            {
+                response.Success = false;
+                response.Message = "No movie with this ID exists in the database";
+                return response;
+            }
+
+            var reviews = await _movieRepository.Reviews
+                .Where(a => a.MovieId == movieId)
+                .Select(r => r.Content)
+                .ToListAsync();
+
+            var message =
+                "Analyze the following movie reviews and write a concise summary that gives potential viewers "
+                + "an overall impression of the movie. Mention common positive and negative opinions, "
+                + "and avoid presenting individual reviews separately."
+                + Environment.NewLine
+                + Environment.NewLine
+                + "Reviews:"
+                + Environment.NewLine
+                + string.Join(Environment.NewLine + Environment.NewLine, reviews);
+
+            var reviewSummary = "New reviews yet";
+
+            if(reviews.Any())
+            {
+                reviewSummary = await _aiService.SendMessageAsync(message);
+            }
+
+            response.Data = new();
+
+            response.Data.ReviewSummary = reviewSummary;
+            response.Success = true;
+            response.Message = "Reviews are fetched successfully";
+
             return response;
         }
     }

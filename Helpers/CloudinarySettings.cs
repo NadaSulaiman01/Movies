@@ -1,10 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace Movies.Helpers
+﻿namespace Movies.Helpers
 {
     public class CloudinarySettings
     {
-
         private static IConfiguration _configuration;
 
         public static string CloudName { get; private set; }

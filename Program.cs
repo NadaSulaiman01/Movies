@@ -1,4 +1,5 @@
 using Movies.Custom_Middleware;
+using Movies.Services.AI_Service;
 using Movies.Services.Cache_Service;
 using Movies.Validators.Movie_Validators;
 using Swashbuckle.AspNetCore.Filters;
@@ -15,6 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IAiService, AiService>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IMovieService, MovieService>();
@@ -121,6 +123,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 var app = builder.Build();
 
 CloudinarySettings.Initialize(builder.Configuration);
+AiSettings.Initialize(builder.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
