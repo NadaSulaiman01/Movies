@@ -2502,20 +2502,38 @@ namespace Movies.Seeds
 
         private async Task<string> DownloadImg(string url, string title, int genreId)
         {
-            // Download the image from the URL
-            using var client = new HttpClient();
-            var response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var imageBytes = await response.Content.ReadAsByteArrayAsync();
+            try
+            {
+                // Download the image from the URL
+                using var client = new HttpClient();
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var imageBytes = await response.Content.ReadAsByteArrayAsync();
 
-            // Convert the image to an IFormFile
-            using var imageStream = new MemoryStream(imageBytes);
-            var imageFile = new FormFile(imageStream, 0, imageBytes.Length, null, Path.GetFileName(url));
+                // Convert the image to an IFormFile
+                using var imageStream = new MemoryStream(imageBytes);
+                var imageFile = new FormFile(imageStream, 0, imageBytes.Length, null, Path.GetFileName(url));
 
-            // Upload the image file
-            var uploadResult = await _cloudinaryService.UploadMovieImageAsync(imageFile, title, genreId);
+                // Upload the image file
+                var uploadResult = await _cloudinaryService.UploadMovieImageAsync(imageFile, title, genreId);
+                return uploadResult.Uri.ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DownloadImg] Failed to download image for '{title}': {ex.Message}");
+                return await UploadPlaceholderAsync(title, genreId);
+            }
+        }
+
+        private async Task<string> UploadPlaceholderAsync(string title, int genreId)
+        {
+            var placeholderPath = Path.Combine(AppContext.BaseDirectory, "Assets", "PlaceholderImage.jpg");
+
+            using var placeholderStream = new FileStream(placeholderPath, FileMode.Open, FileAccess.Read);
+            var placeholderFile = new FormFile(placeholderStream, 0, placeholderStream.Length, null, "PlaceholderImage.jpg");
+
+            var uploadResult = await _cloudinaryService.UploadMovieImageAsync(placeholderFile, title, genreId);
             return uploadResult.Uri.ToString();
-
         }
     }
 }

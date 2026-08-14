@@ -794,11 +794,19 @@ namespace Movies.Services.Movies_Service
                 + "and avoid presenting individual reviews separately."
                 + Environment.NewLine
                 + Environment.NewLine
+                + "Important: Write only the summary itself, as if describing the movie's reception to someone "
+                + "deciding whether to watch it. Do not give instructions, suggestions, or advice to the reader "
+                + "(e.g. do not say things like \"check additional reviews\" or \"if you want a fuller picture\"). "
+                + "Do not comment on the quality, quantity, or limitations of the reviews themselves. "
+                + "If the reviews are too few or too vague to identify common opinions, just summarize the "
+                + "general impression they give without pointing out that limitation."
+                + Environment.NewLine
+                + Environment.NewLine
                 + "Reviews:"
                 + Environment.NewLine
                 + string.Join(Environment.NewLine + Environment.NewLine, reviews);
-
-            var reviewSummary = "New reviews yet";
+            
+            var reviewSummary = "The movie has not received any reviews yet";
 
             if(reviews.Any())
             {
@@ -807,7 +815,7 @@ namespace Movies.Services.Movies_Service
 
             response.Data = new();
 
-            response.Data.ReviewSummary = reviewSummary;
+            response.Data.ReviewSummary = reviewSummary == null ? "Unable to connect to AI server" : reviewSummary;
             response.Success = true;
             response.Message = "Reviews are fetched successfully";
 
